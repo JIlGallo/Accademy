@@ -74,11 +74,6 @@
                         <input type="text" id="txtContatto" class="form-control" @bind-value="@NuovoContatto.Descrizione" />
                     </div>
                 </div>
-                <div class="text-center mb-4">
-                    <button class="btn btn-success" @onclick="@AggiungiContatto">Aggiungi contatto</button>
-
-                </div>
-
                 <div class="text-center">
                     <button class="btn btn-primary" @onclick="@AggiuntaPersonaAvvenuta">Crea Persona</button>
                 </div>
@@ -174,16 +169,13 @@
         {
             try
             {
-                // Chiama il tuo metodo EliminaPersone() qui
                 await AddPersona();
 
-                // Imposta il messaggio di successo
                 mostraAlert = true;
                 messaggioAlert = "Persona creata con successo!";
             }
             catch (Exception ex)
             {
-                // Gestisci l'eccezione e mostra un messaggio di errore
                 mostraAlert = true;
                 messaggioAlert = $"Errore durante l'eliminazione: {ex.Message}";
             }

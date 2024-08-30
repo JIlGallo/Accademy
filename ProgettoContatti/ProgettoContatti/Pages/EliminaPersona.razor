@@ -1,0 +1,75 @@
+﻿@using ProgettoContatti.BL
+@using ProgettoContatti.Services
+@inject IJSRuntime JSRuntime
+@page "/eliminaPersona/{idPersona}"
+
+
+
+<h3>EliminaPersona</h3>
+<form>
+    <div class="content">
+
+        <div class="row p-3">
+            <div style="width:200px;" class="align-middle">
+                <label>Nome:</label>
+            </div>
+            <div class="col-auto">
+                <input type="text" id="txtNome" class="formControl" @bind-value="Persona.Nome" />
+            </div>
+        </div>
+        <div class="row p-3">
+            <div style="width:200px;" class="align-middle">
+                <label>Cognome:</label>
+            </div>
+            <div class="col-auto align-middle">
+                <input type="text" id="txtCognome" class="formControl" @bind-value="Persona.Cognome" />
+            </div>
+        </div>
+    </div>
+    <div class="row p-3">
+        <div class="col-3" style="text-align:right;">
+            <button class="btn btn-danger" @onclick="ConfermaEliminazione">Elimina Persona</button>
+        </div>
+    </div>
+
+</form>
+
+@code {
+    @inject NavigationManager Navigation
+    [Inject] DataProvider DataProvider { get; set; }
+    [Parameter] public string idPersona { get; set; } = "0";
+    public Persona? Persona { get; set; }
+        
+
+    public void GetPersona()
+    {
+        if (string.IsNullOrEmpty(idPersona) || idPersona == "0")
+            return;
+
+        var ret = DataProvider.GetPersonaById(int.Parse(idPersona));
+
+        if (ret != null)
+            Persona = ret;
+    }
+    private async Task ConfermaEliminazione()
+    {
+        bool confermato = await JSRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler eliminare questa persona?");
+        await EliminaPersone();
+    }
+ 
+
+    public async Task EliminaPersone()
+    {
+        int nuovaPersona = DataProvider.EliminaPersona(Persona);
+        await Task.Delay(1000);
+    }
+    protected override void OnInitialized()
+    {
+        GetPersona();
+        StateHasChanged();
+    }
+
+
+
+
+}

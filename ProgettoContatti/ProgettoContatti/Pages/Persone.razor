@@ -1,0 +1,157 @@
+﻿@using ProgettoContatti.BL
+@using ProgettoContatti.DAL.Filtri
+@using ProgettoContatti.ENTITY
+@using ProgettoContatti.ENTITY.Enums
+@using ProgettoContatti.Services
+@inject IJSRuntime JSRuntime
+
+@page "/persone"
+<div style="width: 100%">
+    <h1 class="text-primary "style="font-family:Bahnschrift">Ricerca le persone presenti nel database</h1>
+    <br />
+    <input style="font-family:Bahnschrift" type="text" id="txtFiltroNome" class="bigTextBox" placeholder="Nome..." @bind-value="Filtri.Nome" required="true" />
+    <input style="font-family:Bahnschrift" type="text" id="txtFiltroCognome" class="bigTextBox" placeholder="Cognome..." @bind-value="Filtri.Cognome" />
+    <input style="font-family:Bahnschrift" type="text" id="txtFiltroDataDiNascitaDa" class="bigTextBox" placeholder="Ricerca per anno di nascita da..." @bind-value="Filtri.RangeAnnoNascitaDa" />
+    <input style="font-family:Bahnschrift" type="text" id="txtFiltroDataDiNascitaA" class="bigTextBox" placeholder="Ricerca per anno di nascita a..." @bind-value="Filtri.RangeAnnoNascitaA" />
+    <input style="font-family:Bahnschrift"  type="text" id="txtFiltroEtaDa" class="bigTextBox" placeholder="Ricerca per età da..." @bind-value="Filtri.RangeEtaDa" />
+    <input style="font-family:Bahnschrift" type="text" id="txtFiltroEtaA" class="bigTextBox" placeholder="Ricerca per età a..." @bind-value="Filtri.RangeEtaA" />
+    <select placeholder="Genere..." id="selectGenere" class="" @bind="@FiltroGenere">
+        <option value="0">Tutti</option>
+        <option value="1">@Utility.GetDisplayName(EGenerePersona.Maschio)</option>
+        <option value="2">@Utility.GetDisplayName(EGenerePersona.Femmina)</option>
+        <option value="3">@Utility.GetDisplayName(EGenerePersona.NonDefinito)</option>
+    </select>
+
+    <button @onclick="@Cerca">Cerca</button>
+    <br />
+    <br />
+    <h1 style="font-family:Bahnschrift"class="text-primary">Lista delle persone nel Database</h1>
+    <table class="styled-table">
+        <tr>
+            <th style="text-align: center;"><span style="color: black; font-weight: bold;">Nome </span></th>
+            <th style="text-align: center;"><span style="color: black; font-weight: bold;">Cognome </span></th>
+            <th style="text-align: center;"><span style="color: black; font-weight: bold;">Sesso </span></th>
+            <th style="text-align: center;"><span style="color: black; font-weight: bold;">Età </span></th>
+            <th style="text-align: center;"><span style="color :black">Data di Nascita </span></th>
+            <th style="text-align: center;"><span style="color :black">Contatti </span></th>
+            <th style="text-align: center;"><span style="color :black">Modifica persona </span></th>
+            <th style="text-align: center;"><span style="color :black">Elimina persona </span></th>
+        </tr>
+        @foreach (var persona in persone)
+        {
+            <tr>
+                <td style="text-align: center;"><span style="color: black; font-weight: bold;"> </span>@persona.Nome</td>
+                <td style="text-align: center;"><span style="color: black; font-weight: bold;"> </span>@persona.Cognome</td>
+                <td style="text-align: center;"><span style="color: black; font-weight: bold;"> </span>@Utility.GetDisplayName(persona.Genere)</td>
+                <td style="text-align: center;"><span style="color: black; font-weight: bold;"> </span>@persona.Eta</td>
+                <td style="text-align: center;"><span style="color :black"> </span>@persona.DataDiNascita.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <Modal @ref="modal" Title="Contatti">
+                        <BodyTemplate>
+                            @if (modalPersona?.Contatti?.Any() == true)
+                            {
+                                @foreach (var gruppoContatto in modalPersona.Contatti.GroupBy(c => c.Tipo))
+                                {
+                                    <b>@Utility.GetDisplayName(gruppoContatto.Key)</b> <br />
+                                    <ul>
+                                        @foreach (var contatto in gruppoContatto)
+                                        {
+                                            <li>@contatto.Descrizione</li>
+                                        }
+                                    </ul>
+                                    <hr style="width: 95%; margin: 10px 0;" />
+                                }
+                            }
+                            else
+                            {
+                                <p>Nessun contatto trovato.</p>
+                            }
+                        </BodyTemplate>
+                        <FooterTemplate>
+                            <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Chiudi</Button>
+                        </FooterTemplate>
+                    </Modal>
+                    <Button style="display: block; margin: 0 auto;" Color="ButtonColor.Link" @onclick="() => OnShowModalClick(persona)">Mostra Contatti</Button>
+                </td>
+                @*                 <td style="text-align: center;"><a style="color:darkblue; text-decoration:underline; cursor:pointer" @onclick="(() => VisualizzaContatti(persona.IdPersona, persona.Nome, persona.Cognome))">Contatti</a></td>
+            *@
+                <td><Button style="display: block; margin: 0 auto;" Color="ButtonColor.Link" @onclick="() => ModificaPersona(persona.IdPersona)">Modifica persona</Button></td>
+@*                 <td style="text-align: center;"><a style="color:darkblue; text-decoration:underline; cursor:pointer" @onclick="(() => ModificaPersona(persona.IdPersona))">Modifica</a></td>
+ *@                <td><Button style="display: block; margin: 0 auto;" Color="ButtonColor.Link" @onclick="() => EliminaPersona(persona.IdPersona)">Elimina</Button></td>
+            </tr>
+        }
+    </table>
+
+</div>
+@code {
+    private int FiltroGenere = 0;
+    [Inject] DataProvider DataProvider { get; set; }
+    List<Persona> persone { get; set; } = new List<Persona>();
+    List<Contatto> contatti { get; set; } = new List<Contatto>();
+    protected PersonaFM Filtri = new PersonaFM();
+    @inject NavigationManager Navigation
+    private Modal? modal;
+    private Persona? modalPersona;
+    public Persona? PersonaEliminata { get; set; }
+
+
+
+    public void Cerca()
+    {
+        if (FiltroGenere == 0)
+            Filtri.Genere = null;
+        else
+            Filtri.Genere = (EGenerePersona)FiltroGenere;
+
+        persone = DataProvider.GetPersone(Filtri);
+    }
+
+    protected void VisualizzaContatti(int idPersona, string nomePersona, string cognomePersona)
+    {
+        //Navigation.NavigateTo(string.Format("persona-contatti/{0}/{1}/{2}", idPersona.ToString(), nomePersona, cognomePersona));
+
+
+    }
+
+    protected void ModificaPersona(int idPersona)
+    {
+        Navigation.NavigateTo(string.Format("modificaPersona/{0}", idPersona.ToString()));
+    }
+    // protected void EliminaPersona(int idPersona)
+    // {
+    //     Navigation.NavigateTo(string.Format("eliminaPersona/{0}", idPersona.ToString()));
+    // }
+    
+    private async Task OnShowModalClick(Persona persona)
+    {
+
+        modalPersona = persona; 
+        await modal?.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modal?.HideAsync();
+    }
+    public async Task EliminaPersona(int idPersona)
+    {
+        var personaDaEliminare = persone.FirstOrDefault(p => p.IdPersona == idPersona);
+        bool confermato = await JSRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler eliminare questa persona?");
+
+        if (personaDaEliminare != null)
+        {
+            confermato = true;
+            DataProvider.EliminaPersona(personaDaEliminare);
+            Cerca();
+            StateHasChanged();
+        }
+        else
+        {
+            bool problema = await JSRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler eliminare questa persona?"); // Or display an error message
+        }
+    }
+    protected override void OnInitialized()
+    {
+        Cerca();
+    }
+}

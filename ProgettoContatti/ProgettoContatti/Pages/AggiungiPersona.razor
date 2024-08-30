@@ -1,0 +1,212 @@
+﻿@using ProgettoContatti.BL
+@using ProgettoContatti.DAL.Filtri
+@using ProgettoContatti.ENTITY
+@using ProgettoContatti.ENTITY.Enums
+@using ProgettoContatti.Services
+@inject IJSRuntime JSRuntime
+@page "/aggiungiPersona"
+
+
+
+<div class=" container" style="font-family:Bahnschrift">
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="text-primary">Aggiungi una Persona</h1>
+            <p class="text-muted">Compilare tutti i campi per aggiungere una persona al Database</p>
+            <div class="content">
+                <div class="form-group row mb-3">
+                    <label for="txtNome" class="col-sm-2 col-form-label text-right">Nome:</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="txtNome" placeholder="Mario" class="form-control" @bind-value="NuovaPersona.Nome" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="txtCognome" class="col-sm-2 col-form-label text-right">Cognome:</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="txtCognome" placeholder="Rossi" class="form-control" @bind-value="NuovaPersona.Cognome" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="txtDataNascita" class="col-sm-2 col-form-label text-right">Data di nascita:</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="txtDataNascita" class="form-control" @bind-value="NuovaPersona.DataDiNascita" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="txtEta" class="col-sm-2 col-form-label text-right">Età:</label>
+                    <div class="col-sm-8">
+                        <input type="number" min="0" id="txtEta" class="form-control" @bind-value="NuovaPersona.Eta" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="selectGenere" class="col-sm-2 col-form-label text-right">Genere:</label>
+                    <div class="col-sm-8">
+                        <select id="selectTipoContatto" class="form-control" @bind="NuovaPersona.IntGenere">
+                            <option value="2">@Utility.GetDisplayName(EGenerePersona.Femmina)</option>
+                            <option value="3">@Utility.GetDisplayName(EGenerePersona.NonDefinito)</option>
+                            <option value="1">@Utility.GetDisplayName(EGenerePersona.Maschio)</option>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h1 class="text-primary">Aggiungi i contatti</h1>
+            <p class="text-muted">Compilare tutti i campi per aggiungere i contatti</p>
+
+            <div class="content">
+                <div class="form-group row mb-3">
+                    <label for="selectTipoContatto" class="col-sm-3 col-form-label text-right">Tipologia contatto:</label>
+                    <div class="col-sm-8">
+                        <select id="selectTipoContatto" class="form-control" @bind="@NuovoContatto.IntTipo">
+                            <option value="1">@Utility.GetDisplayName(ETipoContatto.NumeroDiTelefono)</option>
+                            <option value="2">@Utility.GetDisplayName(ETipoContatto.Indirizzo)</option>
+                            <option value="3">@Utility.GetDisplayName(ETipoContatto.SitoWeb)</option>
+                            <option value="4">@Utility.GetDisplayName(ETipoContatto.Email)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="txtContatto" class="col-sm-3 col-form-label text-right">Inserisci contatto:</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="txtContatto" class="form-control" @bind-value="@NuovoContatto.Descrizione" />
+                    </div>
+                </div>
+                <div class="text-center mb-4">
+                    <button class="btn btn-success" @onclick="@AggiungiContatto">Aggiungi contatto</button>
+
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary" @onclick="@AggiuntaPersonaAvvenuta">Crea Persona</button>
+                </div>
+            </div>
+            @if (mostraAlert)
+            {
+                <div class="alert alert-success mt-5" role="alert">
+                    Persona creata con successo!
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+<h2 class="text-primary mt-5 text-center" style="font-family:Bahnschrift">Lista dei contatti</h2>
+<table class=" styled-table" style="font-family:Bahnschrift">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Descrizione</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                @if (NuovaPersona.Contatti != null)
+                {
+                <tbody>
+                    @foreach (var contatto in NuovaPersona.Contatti)
+                    {
+                        <tr>
+                            <td>@Utility.GetDisplayName(contatto.Tipo)</td>
+                            <td>@contatto.Descrizione</td>
+                            <td>
+                                <button class="btn btn-danger" @onclick="() => EliminaContatto(contatto)">Elimina</button>
+                            </td>
+                        </tr>
+                    }
+        </tbody>
+    }
+    else
+    {
+        <h4 style="margin-left:675px ; margin-top:15px ; margin-bottom:15px"><b>Nessun contatto inserito</b></h4>
+    }
+</table>
+        
+
+
+@code {
+    private Modal modal;
+    private int FiltroGenere = 0;
+    @inject NavigationManager Navigation
+    [Inject] DataProvider DataProvider { get; set; }
+    List<Persona> persone { get; set; } = new List<Persona>();
+    List<Contatto> contatti { get; set; } = new List<Contatto>();
+    protected PersonaFM Filtri = new PersonaFM();
+    public Persona NuovaPersona { get; set; } = new Persona();
+    public Contatto NuovoContatto { get; set; } = new Contatto();
+
+
+    private bool mostraAlert = false;
+    private string messaggioAlert = "";
+
+    public void AggiungiContatto()
+    {
+        if (NuovaPersona.Contatti == null)
+            NuovaPersona.Contatti = new();
+        NuovaPersona.Contatti.Add(NuovoContatto);
+        NuovoContatto = new ();
+    }
+    public void EliminaContatto(Contatto contatto)
+    {
+        if(NuovaPersona.Contatti != null)
+    {   
+            NuovaPersona.Contatti.Remove(contatto);
+
+        }
+    }
+
+    public void Cerca()
+    {
+        if (FiltroGenere == 0)
+            Filtri.Genere = null;
+        else
+            Filtri.Genere = (EGenerePersona)FiltroGenere;
+
+        persone = DataProvider.GetPersone(Filtri);
+    }
+
+    private async Task AggiuntaPersonaAvvenuta()
+    {
+        bool confermato = await JSRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler creare questa persona?");
+
+        if (confermato)
+        {
+            try
+            {
+                // Chiama il tuo metodo EliminaPersone() qui
+                await AddPersona();
+
+                // Imposta il messaggio di successo
+                mostraAlert = true;
+                messaggioAlert = "Persona creata con successo!";
+            }
+            catch (Exception ex)
+            {
+                // Gestisci l'eccezione e mostra un messaggio di errore
+                mostraAlert = true;
+                messaggioAlert = $"Errore durante l'eliminazione: {ex.Message}";
+            }
+        }
+    }
+
+
+    public async Task AddPersona()
+    {
+        bool ret = true;
+        #region Validazioni
+
+        if (string.IsNullOrEmpty(NuovaPersona.Nome))
+            ret = false;
+        if (string.IsNullOrEmpty(NuovaPersona.Cognome))
+            ret = false;
+        #endregion
+
+        int nuovoId = DataProvider.AddPersona(NuovaPersona);
+        await Task.Delay(1000);
+
+
+    }
+
+
+}

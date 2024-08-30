@@ -1,0 +1,63 @@
+﻿@page "/persona-contatti/{idPersona}/{personaDescNome}/{personaDescCognome}"
+@using ProgettoContatti.BL
+@using ProgettoContatti.ENTITY
+@using ProgettoContatti.Services
+@inject IJSRuntime JSRuntime
+
+<h1>Contatti</h1>
+<br />
+<table class="styled-table-1">
+    <ul>
+
+        <li>
+            <h4>@Persona.Nome @Persona.Cognome</h4>
+            <ul>
+                @if (Persona.Contatti != null && Persona.Contatti.Count > 0)
+                {
+                    @foreach (var contatto in Persona.Contatti)
+                    {
+                        <li><b>@contatto.Tipo: </b>@contatto.Descrizione</li>
+                    }
+                }
+                else
+                {
+                    <li>Nessun contatto trovato.</li>
+                }
+            </ul>
+        </li>
+
+    </ul>
+</table>
+@code {
+    [Inject] DataProvider DataProvider { get; set; }
+
+    [Parameter] public string idPersona { get; set; } = "0";
+    [Parameter] public string personaDescNome { get; set; } = string.Empty;
+    [Parameter] public string personaDescCognome { get; set; } = string.Empty;
+    List<Persona> persone { get; set; } = new List<Persona>();
+    public Persona? Persona { get; set; }
+
+   
+    public void GetPersona()
+    {
+        if (string.IsNullOrEmpty(idPersona) || idPersona == "0")
+            return;
+
+        var ret = DataProvider.GetPersonaById(int.Parse(idPersona));
+
+        if (ret != null)
+            Persona = ret;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        Persona = DataProvider.GetPersonaByIdContatti(int.Parse(idPersona));
+    }
+
+
+    protected override void OnInitialized()
+    {
+        GetPersona();
+       
+    }
+
+}

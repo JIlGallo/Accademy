@@ -1,0 +1,49 @@
+﻿@page "/persona-contatti/{idPersona}/{personaDescNome}/{personaDescCognome}"
+@using ProgettoContatti.BL
+@using ProgettoContatti.ENTITY
+@using ProgettoContatti.WebApp.Services
+
+
+<div style="width: 100%">
+    <h1>Contatti</h1>
+    <br />
+
+    <table class="styled-table">
+        <tr>
+            <th><span style="color :black">Persona</span></th>
+            <th><span style="color :black">Tipologia</span></th>
+            <th><span style="color: black; font-weight: bold;">Descrizione </span></th>
+
+        </tr>
+        @foreach (var contatto in contatti)
+        {
+            <tr>
+                <td><span style="color: black; font-weight: bold;"> </span>@personaDescNome @personaDescCognome</td>
+                <td><span style="color: black; font-weight: bold;"> </span>@contatto.Descrizione</td>
+                <td><span style="color :black"> </span>@Utility.GetDisplayName(contatto.Tipo)</td>
+            </tr>
+        }
+    </table>
+</div>
+
+@code {
+    public DataProvider DataProvider { get; set; } = new DataProvider();
+
+    [Parameter] public string idPersona { get; set; } = "0";
+    [Parameter] public string personaDescNome { get; set; } = string.Empty;
+    [Parameter] public string personaDescCognome { get; set; } = string.Empty;
+
+
+    List<Contatto> contatti { get; set; } = new List<Contatto>();
+
+    protected override void OnInitialized()
+    {
+        GetContatto();
+    }
+    public void GetContatto()
+    {
+        contatti = DataProvider.GetContatti(int.Parse(idPersona));
+    }
+
+
+}

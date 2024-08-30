@@ -1,0 +1,149 @@
+﻿@inject IJSRuntime JSRuntime
+@using ProgettoContatti.BL
+@using ProgettoContatti.DAL.DataAccess
+@using ProgettoContatti.ENTITY.Enums
+@using ProgettoContatti.Services
+@page "/modificaPersona/{idPersona}"
+
+<div class="container " style="font-family:Bahnschrift">
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="text-primary">Modifica la persona</h1>
+            <p class="text-muted">Compilare tutti i campi per modificare la persona </p>
+            <div class="content">
+                <div class="form-group row mb-3">
+                    <label for="txtNome" class="col-sm-2 col-form-label text-right">Nome:</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="txtNome" placeholder="Mario" class="form-control" @bind-value="Persona.Nome" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="txtCognome" class="col-sm-2 col-form-label text-right">Cognome:</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="txtCognome" placeholder="Rossi" class="form-control" @bind-value="Persona.Cognome" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="txtDataNascita" class="col-sm-2 col-form-label text-right">Data di nascita:</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="txtDataNascita" class="form-control" @bind-value="Persona.DataDiNascita" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="txtEta" class="col-sm-2 col-form-label text-right">Età:</label>
+                    <div class="col-sm-8">
+                        <input type="number" min="0" id="txtEta" class="form-control" @bind-value="Persona.Eta" required />
+                    </div>
+                </div>
+                <div class="form-group row mb-3">
+                    <label for="selectGenere" class="col-sm-2 col-form-label text-right">Genere:</label>
+                    <div class="col-sm-8">
+                        <select id="selectTipoContatto" class="form-control" @bind="Persona.IntGenere">
+                            <option value="2">@Utility.GetDisplayName(EGenerePersona.Femmina)</option>
+                            <option value="3">@Utility.GetDisplayName(EGenerePersona.NonDefinito)</option>
+                            <option value="1">@Utility.GetDisplayName(EGenerePersona.Maschio)</option>
+
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="text-center mb-4 d-flex justify-content-center">
+                <button class="btn btn-primary" @onclick="ModificaPersonaAvvenuta">Modifica la persona</button>
+            </div>
+
+
+        </div>
+        <div class="col-md-6">
+            <h1 class="text-primary text-center no-top-margin"style="margin-bottom:43px">Lista dei contatti</h1>
+            @if (Persona?.Contatti?.Any() == true)
+            {
+                <ul>
+                    @foreach (var gruppoContatto in Persona.Contatti.GroupBy(c => c.Tipo))
+                    {
+                        <b>@Utility.GetDisplayName(gruppoContatto.Key)</b>
+                        @foreach (var contatto in gruppoContatto)
+                        {
+                            <li class="d-flex align-items-center mb-2">
+                                <input type="text" class="form-control me-2 flex-grow-1" @bind-value="@contatto.Descrizione" />
+                                <button class="btn btn-primary me-2 btn-sm" style="width:140px;height:38px" @onclick="() => ModificaContatto(contatto)">Modifica </button>
+                                @if (contatto != null)
+                                {
+                                    <button class="btn btn-danger btn-sm" style="width:150px;height:38px" @onclick=" ()=> EliminaContatto(contatto)">Elimina </button>
+                                }
+                                else
+                                {
+                                    <h1 style="text-align: center; margin: auto; display: block; height: 100vh;">Contatti eliminati</h1>
+                                }
+                            </li>
+                        }
+                    }
+                </ul>
+            }
+            else
+            {
+                <h3 style="margin-left:170px">Nessun contatto trovato.</h3>
+            }
+        </div>
+
+    </div>
+</div>
+@code {
+
+    @inject NavigationManager Navigation
+    [Inject] DataProvider DataProvider { get; set; }
+
+    [Parameter] public string idPersona { get; set; } = "0";
+    public Persona? Persona { get; set; }
+    private Persona? modalPersona;
+    List<Contatto> contatti { get; set; } = new List<Contatto>();
+    List<Persona> persone { get; set; } = new List<Persona>();
+
+
+    public async Task EliminaContatto(Contatto contatto)
+    {
+        var elimina = DataProvider.EliminaContatto(contatto);
+        await Task.Delay(50);
+        GetPersona();
+        StateHasChanged();
+    }
+    public async Task ModificaContatto(Contatto contatto)
+    {
+        var modifica = DataProvider.ModificaContatto(contatto);
+        await Task.Delay(50);
+        GetPersona();
+        StateHasChanged();
+    }
+
+
+    public void GetPersona()
+    {
+        if (string.IsNullOrEmpty(idPersona) || idPersona == "0")
+            return;
+
+        var ret = DataProvider.GetPersonaById(int.Parse(idPersona));
+
+        if (ret != null)
+            Persona = ret;
+    }
+
+    public async Task ModificaPersone()
+    {
+        int nuovaPersona = DataProvider.ModificaPersona(Persona);
+        await Task.Delay(500);
+    }
+
+
+    private async Task ModificaPersonaAvvenuta()
+    {
+        bool confermato = await JSRuntime.InvokeAsync<bool>("confirm", "Sei sicuro di voler modificare questa persona?");
+
+        await ModificaPersone();
+    }
+
+    protected override void OnInitialized()
+    {
+        GetPersona();
+        StateHasChanged();
+    }
+    }

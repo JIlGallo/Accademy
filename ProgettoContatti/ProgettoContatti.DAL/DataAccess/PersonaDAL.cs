@@ -184,5 +184,6 @@ namespace ProgettoContatti.DAL.DataAccess
             persona = result.FirstOrDefault(); 
             return persona;
         }
+
     }
 }

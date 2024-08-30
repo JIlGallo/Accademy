@@ -1,4 +1,5 @@
 ﻿using ProgettoContatti.BL;
+using ProgettoContatti.DAL.Models;
 using System.Reflection.Metadata.Ecma335;
 
 namespace ProgettoContatti.DAL.DataAccess
@@ -67,13 +68,28 @@ namespace ProgettoContatti.DAL.DataAccess
             if (contattoModificato != null)
             {
                 contattoModificato.Descrizione = contatto.Descrizione;
-                contattoModificato.Tipo = contatto.Tipo;  
+                contattoModificato.Tipo = contatto.Tipo;
                 Context.Contatti.Update(contattoModificato);
                 Context.SaveChanges();
                 return contatto.IdContatto;
             }
             return 0;
 
+        }
+        public int AggiungiContatto(Contatto contatto)
+        {
+            ContattoModel contattom= new ContattoModel();
+            contattom.IdPersona = contatto.IdPersona;
+            contattom.Descrizione = contatto.Descrizione;
+            contattom.Tipo = contatto.Tipo;
+            if (contatto != null)
+            {
+                Context.Contatti.Add(contattom);
+                Context.SaveChanges();
+                return contattom.IdContatto;
+
+            }
+            return 0;
         }
     }
 }

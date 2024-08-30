@@ -55,6 +55,12 @@ namespace ProgettoContatti.Services
             ContattoDAL ContattoDAL = new ContattoDAL();
             return ContattoDAL.ModificaContatto(contatto);
         }
+        public int AggiungiContatto(Contatto contatto)
+        {
+            ContattoDAL ContattoDAL = new ContattoDAL();
+            return ContattoDAL.AggiungiContatto(contatto);
+        }
+
 
 
 

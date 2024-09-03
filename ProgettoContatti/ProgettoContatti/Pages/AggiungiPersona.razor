@@ -1,14 +1,11 @@
 ﻿@using ProgettoContatti.BL
+@using System.ComponentModel.DataAnnotations
 @using ProgettoContatti.DAL.Filtri
 @using ProgettoContatti.ENTITY
 @using ProgettoContatti.ENTITY.Enums
 @using ProgettoContatti.Services
 @inject IJSRuntime JSRuntime
 @page "/aggiungiPersona"
-
-
-
-@using System.ComponentModel.DataAnnotations
 
 <div class="container" style="font-family: Bahnschrift">
     <EditForm Model="@NuovaPersona" OnValidSubmit="@AggiuntaPersonaAvvenuta">
@@ -42,7 +39,7 @@
                     <div class="form-group row mb-3">
                         <label for="txtEta" class="col-sm-2 col-form-label text-right">Età:</label>
                         <div class="col-sm-8">
-                            <InputNumber id="txtEta" min="0" max="100" class="form-control" @bind-Value="NuovaPersona.Eta" />
+                            <InputNumber id="txtEta" min="1" max="100" class="form-control" @bind-Value="NuovaPersona.Eta" />
                             <ValidationMessage For="@(() => NuovaPersona.Eta)" />
                         </div>
                     </div>

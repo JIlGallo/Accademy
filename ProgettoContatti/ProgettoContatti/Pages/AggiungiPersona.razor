@@ -39,7 +39,7 @@
                     <div class="form-group row mb-3">
                         <label for="txtEta" class="col-sm-2 col-form-label text-right">Età:</label>
                         <div class="col-sm-8">
-                            <InputNumber id="txtEta" min="1" max="100" class="form-control" @bind-Value="NuovaPersona.Eta" />
+                            <InputNumber id="txtEta"  class="form-control" @bind-Value="NuovaPersona.Eta" />
                             <ValidationMessage For="@(() => NuovaPersona.Eta)" />
                         </div>
                     </div>
@@ -101,15 +101,16 @@
 
 <h2 class="text-primary mt-5 text-center" style="font-family: Bahnschrift">Lista dei contatti</h2>
 <table class="styled-table" style="font-family: Bahnschrift">
-    <thead class="thead-dark">
-        <tr>
-            <th>Tipo</th>
-            <th>Descrizione</th>
-            <th>Azioni</th>
-        </tr>
-    </thead>
+    
     @if (NuovaPersona.Contatti != null)
     {
+        <thead class="thead-dark">
+            <tr>
+                <th width="45%">Tipo</th>
+                <th width="45%">Descrizione</th>
+                <th width="45%">Azioni</th>
+            </tr>
+        </thead>
         <tbody>
             @foreach (var contatto in NuovaPersona.Contatti)
             {
@@ -131,10 +132,10 @@
 
 
 @code {
-    private Modal modal;
+    private Modal? modal;
     private int FiltroGenere = 0;
     @inject NavigationManager Navigation
-    [Inject] DataProvider DataProvider { get; set; }
+    [Inject] DataProvider? DataProvider { get; set; }
     List<Persona> persone { get; set; } = new List<Persona>();
     List<Contatto> contatti { get; set; } = new List<Contatto>();
     protected PersonaFM Filtri = new PersonaFM();

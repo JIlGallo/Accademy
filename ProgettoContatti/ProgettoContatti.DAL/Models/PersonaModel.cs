@@ -20,12 +20,12 @@ namespace ProgettoContatti.DAL.Models
         public string Cognome { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Inserisci l'età")]
+        [Range(1, 120, ErrorMessage = "L'età deve essere compresa tra 1 e 120 anni.")]
         public int Eta { get; set; }
 
         [Required(ErrorMessage = "Inserisci la data di nascita")]
         public DateTime DataDiNascita { get; set; }
 
-        [Required(ErrorMessage = "Inserisci il genere")]
         public EGenerePersona Genere { get; set; }
 
         [InverseProperty(nameof(ContattoModel.Persona))]

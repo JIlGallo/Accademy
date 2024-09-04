@@ -8,10 +8,14 @@ namespace ProgettoContatti.BL
         public int IdPersona { get; set; }
 
         [Required(ErrorMessage = "Inserisci il nome")]
+        [MinLength(2, ErrorMessage = "Il nome deve contenere almeno 2 lettere")]
+        [MaxLength(20, ErrorMessage = "Il nome deve contenere al massimo 20 lettere")]
         public string Nome { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Inserisci il cognome")]
-        public string Cognome { get; set; } = string.Empty;
+        [MinLength(2, ErrorMessage = "Il cognome deve contenere almeno 2 lettere")]
+        [MaxLength(20, ErrorMessage = "Il cognome deve contenere al massimo 20 lettere")]
+         public string Cognome { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Inserisci l'età")]
         [Range(1, 120, ErrorMessage = "L'età deve essere compresa tra 1 e 120 anni.")]

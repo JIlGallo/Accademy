@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProgettoContatti.BL;
 using ProgettoContatti.DAL.Models;
 using ProgettoContatti.ENTITY.Enums;
 
@@ -83,16 +82,6 @@ namespace ProgettoContatti.DAL
             }
             #endregion
         }
-
-        // fare metodo che restituisce persone con contatti
-        // suggerimento guardare clausola include linguaggio linq
-
-
-        //public async Task <List<PersonaModel>> GetPersoneConContatti()
-        //{
-
-        //    return await Persone.Include(c => c.Contatti).ToListAsync();
-        //}
         
         public List<PersonaModel> GetPersoneConContatti()
         {

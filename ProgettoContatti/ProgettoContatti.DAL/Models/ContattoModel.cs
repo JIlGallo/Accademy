@@ -26,3 +26,4 @@ namespace ProgettoContatti.DAL.Models
         public PersonaModel? Persona { get; set; }
     }
 }
+

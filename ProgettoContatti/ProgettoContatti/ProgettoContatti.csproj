@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Pages\Alert.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Blazor.Bootstrap" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
@@ -21,18 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ProgettoContatti.DAL\ProgettoContatti.DAL.csproj" />
     <ProjectReference Include="..\ProgettoContatti.ENTITY\ProgettoContatti.BL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Pages\Alert.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Pages\Alert.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Pages\Alert.razor" />
   </ItemGroup>
 
 </Project>

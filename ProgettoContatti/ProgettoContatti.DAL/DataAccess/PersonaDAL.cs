@@ -14,41 +14,6 @@ namespace ProgettoContatti.DAL.DataAccess
         {
             throw new NotImplementedException();
         }
-        //public List<Persona> GetPersona(PersonaFM? Filtri = null)
-        //{
-        //    List<Persona> persone = new List<Persona>()
-        //    {
-
-        //    new Persona{IdPersona=1,Nome="Ciccio",Cognome="Panza",Genere=EGenerePersona.Maschio,Eta=34,DataDiNascita= new DateTime(1986,07,23)},
-        //    new Persona{IdPersona=2,Nome="Nello",Cognome="Panzona",Genere=EGenerePersona.Femmina,Eta=67,DataDiNascita= new DateTime(1986,02,25)},
-        //    new Persona{IdPersona=3,Nome="Maccio",Cognome="Pane",Genere=EGenerePersona.Maschio,Eta=31,DataDiNascita= new DateTime(1989,05,3)},
-        //    new Persona{IdPersona=4,Nome="Roberto",Cognome="Canzoni",Genere=EGenerePersona.Maschio,Eta=76,DataDiNascita= new DateTime(1947,03,2),},
-        //    new Persona{IdPersona=5,Nome="Carlo",Cognome="Tarollo",Genere=EGenerePersona.Femmina,Eta=13,DataDiNascita= new DateTime(2011,09,29),},
-        //    new Persona{IdPersona=6,Nome="Marco",Cognome="Sinola",Genere=EGenerePersona.Maschio,Eta=26,DataDiNascita= new DateTime(1996,09,13),},
-        //    new Persona{IdPersona=7,Nome="Danilo",Cognome="Lartona",Genere=EGenerePersona.Femmina,Eta=54,DataDiNascita= new DateTime(1969,01,7),}
-        //    };
-
-        //    //Applico i Filtri
-        //    if (Filtri != null)
-        //    {
-        //        if (!string.IsNullOrEmpty(Filtri.Nome))
-        //            persone = persone.Where(x => x.Nome.ToUpper().Contains(Filtri.Nome.ToUpper())).ToList();
-        //        if (!string.IsNullOrEmpty(Filtri.Cognome))
-        //            persone = persone.Where(x => x.Cognome.ToUpper().Contains(Filtri.Cognome.ToUpper())).ToList();
-        //        if (Filtri.RangeAnnoNascitaDa.HasValue)
-        //            persone = persone.Where(x => x.DataDiNascita.Date.Year >= Filtri.RangeAnnoNascitaDa.Value).ToList();
-        //        if (Filtri.RangeAnnoNascitaA.HasValue)
-        //            persone = persone.Where(x => x.DataDiNascita.Date.Year <= Filtri.RangeAnnoNascitaA.Value).ToList();
-        //        if (Filtri.RangeEtaDa.HasValue)
-        //            persone = persone.Where(x => x.Eta >= Filtri.RangeEtaDa.Value).ToList();
-        //        if (Filtri.RangeEtaA.HasValue)
-        //            persone = persone.Where(x => x.Eta <= Filtri.RangeEtaA.Value).ToList();
-        //        if (Filtri.Genere.HasValue)
-        //            persone = persone.Where(x => x.Genere == Filtri.Genere).ToList();
-        //    }
-        //    return persone;
-        //}
-
         public int AddPersona(Persona persona)
         {
             var nuovaPersona = new PersonaModel

@@ -20,12 +20,6 @@ builder.Services.AddDbContextFactory<RubricaContext>(options =>
     options.EnableSensitiveDataLogging();
 });
 
-//builder.Services.AddDbContext<WhistleblowingDbContext>(options =>
-//    {
-//        options.UseSqlServer(connectionString);
-//        options.EnableSensitiveDataLogging(true);
-//    });
-
 var app = builder.Build();
 
 
